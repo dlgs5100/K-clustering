@@ -1,27 +1,55 @@
 from sklearn import datasets
 import random
 import numpy
+import time
+import csv
+
 import matplotlib.pyplot as plt
 
 K = 3
 belongCluster = []
 sourceData = None
 centerData = None
+sum_of_square_error = 0
 
 def main():
-      global sourceData, centerData
+      global sourceData, centerData, K
 
-      
-      iris = datasets.load_iris()
-      sourceData = iris.data[:, :4]  
-      centerData = initCluster()  #shape[0]表資料數，shape[0]表資料維度
-      for i in range(30):
-            Clustering()
-            updateCenter()
-      drawPlot()
+      dataset = input('Choose dataset, 1) Iris, 2) Abalone：')
+      K = int(input('Define number of K：'))
+      if dataset == '1':
+            iris = datasets.load_iris()
+            sourceData = iris.data[:, :4]
+      elif dataset == '2':  
+            with open('abalone.csv', 'r') as f:
+                  reader = csv.reader(f)
+                  sourceData = list(reader)
+            for i in range(len(sourceData)):
+                  sourceData[i] = [str(ord(x)) if x.isalpha() else x for x in sourceData[i]]
+                  sourceData[i] = [float(x) if True else x for x in sourceData[i]]
+      try:  
+            start = time.time()
+
+            sourceData = numpy.asarray(sourceData)
+            centerData = initCluster()  #shape[0]表資料數，shape[0]表資料維度
+            iter = 0
+            while True:
+                  Clustering()
+                  isDone = updateCenter()
+                  print(sum_of_square_error)
+                  if isDone and iter > 20:
+                        break
+                  iter+=1
+
+            end = time.time()
+            print('Spent time:', end-start, 's')
+
+            drawPlot()
+      except BaseException:
+            print('Error')
 
 def initCluster():
-      global sourceData, centerData
+      global sourceData, centerData, K
 
       for i in range(sourceData.shape[0]):
             belongCluster.append(-1)
@@ -33,7 +61,7 @@ def initCluster():
       return centerData
 
 def Clustering():
-      global sourceData, centerData
+      global sourceData, centerData, K
 
       for index, data in enumerate(sourceData):
             minDistance = -1
@@ -44,15 +72,22 @@ def Clustering():
                         belongCluster[index] = k
 
 def updateCenter():
-      global sourceData, centerData
+      global sourceData, centerData, sum_of_square_error, K
 
+      sse = 0
       for k in range(K):
-            temp = [0,0,0,0]
+            tempSum = [0]*sourceData.shape[1]
             index = [i for i,x in enumerate(belongCluster) if x == k]
             for dim in range(sourceData.shape[1]):
                   for i in index:
-                        temp[dim] += sourceData[i][dim]
-                  centerData[k][dim] = temp[dim] / len(index)
+                        tempSum[dim] += sourceData[i][dim]
+                        sse += numpy.square(sourceData[i][dim]-centerData[k][dim])
+                  centerData[k][dim] = tempSum[dim] / len(index)
+      if sse == sum_of_square_error:
+            return True
+      else:
+            sum_of_square_error = sse
+            return False
 
 def calDistance(data, center, dim):
       sum = 0
