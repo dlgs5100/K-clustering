@@ -7,42 +7,50 @@
 from sklearn import datasets
 import random
 import numpy
+import copy
 import time
 import csv
 import matplotlib.pyplot as plt
 
+N = 10
 K = 3
 belongCluster = []
+sum_of_square_error = []
+outputData = []
 sourceData = None
 centerData = None
-sum_of_square_error = 0
 
 def main():
-      global sourceData, centerData, K
+      global sourceData, centerData, K, N
 
       inputDataset()
       try:  
-            start = time.time()
+            for n_th in range(N):
+                  InitVariable()
+                  start = time.time()
 
-            centerData = initCluster()  #Step 1.
-            iter = 0
-            while True:
-                  countChangingCluster = Clustering() #Step 2.
-                  isDone = updateCenter() #Step 3.
-                  print(sum_of_square_error)
-                  if isDone or iter > 50 or countChangingCluster == 0:
-                        break
-                  iter+=1
+                  centerData = initCluster()  #Step 1.
+                  iter = 0
+                  while True:
+                        countChangingCluster = Clustering() #Step 2.
+                        isDone = updateCenter() #Step 3.
+                        if isDone or iter > 50 or countChangingCluster == 0:
+                              break
+                        iter+=1
 
-            end = time.time()
-            print('Spent time:', end-start, 's')
+                  end = time.time()
 
-            drawPlot()
+                  outputData.append('Cost '+str(iter)+ ' rounds.')
+                  outputData.append('Time: '+str(end-start)+' s')
+                  outputData.append(copy.deepcopy(sum_of_square_error))
+                  outputData.append('*--------------------------*')
+            outputResult(outputData)
+                  # drawPlot()
       except BaseException:
             print('Error')
 
 def inputDataset():
-      global sourceData
+      global sourceData, K
 
       dataset = input('Choose dataset, 1) Iris, 2) Abalone：')
       K = int(input('Define number of K：'))
@@ -58,11 +66,13 @@ def inputDataset():
                   sourceData[i] = [float(x) if True else x for x in sourceData[i]]
             sourceData = numpy.asarray(sourceData)
 
-def initCluster():
-      global sourceData, centerData, K
-
+def InitVariable():
       for i in range(sourceData.shape[0]):      # Initialize所有data歸屬群
             belongCluster.append(-1)
+      sum_of_square_error.clear()
+
+def initCluster():
+      global sourceData, centerData, K
 
       # Randomly select cluster center
       index = random.sample(range(sourceData.shape[0]), K)
@@ -100,10 +110,12 @@ def updateCenter():
                         tempSum[dim] += sourceData[i][dim]
                         sse += numpy.square(sourceData[i][dim]-centerData[k][dim])
                   centerData[k][dim] = tempSum[dim] / len(index)
-      if sse == sum_of_square_error:
-            return True
+
+      sum_of_square_error.append(sse)
+      if len(sum_of_square_error) != 1:   # Sum_of_square_error 停止條件
+            if sum_of_square_error[-1] == sum_of_square_error[-2]:
+                  return True
       else:
-            sum_of_square_error = sse
             return False
 
 def calDistance(data, center, dim):
@@ -118,6 +130,17 @@ def countListDiff(list1, list2):
             if list1[i] != list2[i]:
                   retSum += 1
       return retSum
+
+def outputResult(outputData):
+      with open('result_K-means.txt', 'w') as file:
+            for data in outputData:
+                  if isinstance(data, list):
+                        for item in data:
+                              file.write('%s\n' % item)
+                  else:
+                        file.write('%s\n' % data)
+            
+            file.close()
 
 def drawPlot():
       plt.scatter(sourceData[:, 0], sourceData[:, 1], c=belongCluster)
