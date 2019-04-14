@@ -4,7 +4,7 @@
 #Step 3. 算出該群中所有點的新中心
 #Step 4. 若群中所有點不再變動或達到最大迭代次數則為收斂，否則回到Step 2.狀態
 #############################################################################
-from sklearn import datasets
+from sklearn import datasets, metrics
 import random
 import numpy
 import copy
@@ -12,8 +12,8 @@ import time
 import csv
 import matplotlib.pyplot as plt
 
-N = 10
-K = 3
+N = 0
+K = 0
 belongCluster = []
 sum_of_square_error = []
 outputData = []
@@ -26,34 +26,38 @@ def main():
       inputDataset()
       try:  
             for n_th in range(N):
-                  InitVariable()
-                  start = time.time()
+                  for K in range(2,11,1):
+                        initVariable()
+                        start = time.time()
 
-                  centerData = initCluster()  #Step 1.
-                  iter = 0
-                  while True:
-                        countChangingCluster = Clustering() #Step 2.
-                        isDone = updateCenter() #Step 3.
-                        if isDone or iter > 50 or countChangingCluster == 0:
-                              break
-                        iter+=1
+                        initCentroid()  #Step 1.
+                        iter = 0
+                        while True:
+                              countChangingCluster = fitting() #Step 2.
+                              isDone = updateCentroid() #Step 3.
+                              if isDone or iter > 50 or countChangingCluster == 0:
+                                    break
+                              iter+=1
 
-                  end = time.time()
+                        end = time.time()
 
-                  outputData.append('Cost '+str(iter)+ ' rounds.')
-                  outputData.append('Time: '+str(end-start)+' s')
-                  outputData.append(copy.deepcopy(sum_of_square_error))
-                  outputData.append('*--------------------------*')
+                        outputData.append('K: '+str(K))
+                        outputData.append('Cost '+str(iter)+ ' iterations.')
+                        outputData.append('Time: '+str(end-start)+' s')
+                        # 輪廓係數
+                        # 表樣本與同類別距離相近，不同類別距離遠離的程度，範圍[-1,1]
+                        outputData.append('Silhouette_score: '+str(metrics.silhouette_score(sourceData, belongCluster)))
+                        outputData.append(copy.deepcopy(sum_of_square_error))
+                        outputData.append('*--------------------------*')
             outputResult(outputData)
-                  # drawPlot()
       except BaseException:
             print('Error')
 
 def inputDataset():
-      global sourceData, K
+      global sourceData, N
 
       dataset = input('Choose dataset, 1) Iris, 2) Abalone：')
-      K = int(input('Define number of K：'))
+      N = int(input('Determine running time：'))
       if dataset == '1':
             iris = datasets.load_iris()
             sourceData = iris.data[:, :4]
@@ -66,23 +70,22 @@ def inputDataset():
                   sourceData[i] = [float(x) if True else x for x in sourceData[i]]
             sourceData = numpy.asarray(sourceData)
 
-def InitVariable():
+def initVariable():
+      belongCluster.clear()
       for i in range(sourceData.shape[0]):      # Initialize所有data歸屬群
             belongCluster.append(-1)
       sum_of_square_error.clear()
 
-def initCluster():
+def initCentroid():
       global sourceData, centerData, K
 
       # Randomly select cluster center
       index = random.sample(range(sourceData.shape[0]), K)
       centerData = []
       for i in index:
-            centerData.append(list(sourceData[i]))
+            centerData.append(copy.deepcopy(list(sourceData[i])))
 
-      return centerData
-
-def Clustering():
+def fitting():
       global sourceData, centerData, K
       
       latestBelongCluster = belongCluster.copy()
@@ -98,7 +101,7 @@ def Clustering():
       countChangingCluster = countListDiff(latestBelongCluster,belongCluster) #計算ata的變動情況
       return countChangingCluster
 
-def updateCenter():
+def updateCentroid():
       global sourceData, centerData, sum_of_square_error, K
 
       sse = 0
