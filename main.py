@@ -13,9 +13,10 @@ def main():
       sourceData = inputDataset()
       choose = int(input('Determine the clustering algorithm, 1) K-means, 2) K-means++：'))
       N = int(input('Determine running time：'))
+      K1, K2 = map(int,input('Determine K range, (ex:2 10)：').split())
       try:  
             for n_th in range(N):
-                  for K in range(2,11,1):
+                  for K in range(K1,K2+1,1):
                         if choose == 1:
                               k_cluster = K_means(sourceData, K)
                         elif choose == 2:
@@ -41,6 +42,7 @@ def main():
                         # 輪廓係數
                         # 表樣本與同類別距離相近，不同類別距離遠離的程度，範圍[-1,1]
                         outputData.append('Silhouette_score: '+str(metrics.silhouette_score(sourceData, k_cluster.belongCluster)))
+                        outputData.append('Sum of square error:')
                         outputData.append(k_cluster.sum_of_square_error.copy())
                         outputData.append('*--------------------------*')
             outputResult(outputData)
