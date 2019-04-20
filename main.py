@@ -13,7 +13,7 @@ def main():
       sourceData = inputDataset()
       choose = int(input('Determine the clustering algorithm, 1) K-means, 2) K-means++：'))
       N = int(input('Determine running time：'))
-      K1, K2 = map(int,input('Determine K range, (ex:2 10)：').split())
+      K1, K2 = map(int,input('Determine K range, (ex:2 10, K=2~10)：').split())
       try:  
             for n_th in range(N):
                   for K in range(K1,K2+1,1):
@@ -56,7 +56,7 @@ def inputDataset():
       dataset = input('Choose dataset, 1) Iris, 2) Abalone：')
       if dataset == '1':
             #   iris = datasets.load_iris()
-            #   sourceData = iris.data[:, :4]     # shape[0]:資料數，shape[0]:資料維度
+            #   sourceData = iris.data[:, :4]     # shape[0]:資料數，shape[1]:資料維度
             with open('iris.csv', 'r') as f:
                   reader = csv.reader(f)
                   sourceData = list(reader)
