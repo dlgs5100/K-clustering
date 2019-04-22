@@ -37,7 +37,7 @@ class K_means():
             for k in range(self.K):
                   index = [i for i,x in enumerate(self.belongCluster) if x == k]   # 找到在belongCluster中所有值為k的元素index
                   sse += sum([self.calDistance(element, self.centerData[k], self.dim) for element in self.sourceData[index,:]])
-                  self.centerData[k] = numpy.mean(self.sourceData[index,:], 0)
+                  self.centerData[k] = numpy.mean(self.sourceData[index,:], 0)      # 找在此list index數據中的均值
             
             self.sum_of_square_error.append(sse)
 
