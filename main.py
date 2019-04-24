@@ -98,7 +98,7 @@ def outputResult(K, iter, time, silhouette_score, sum_of_square_error):
 
 def outputPlot(K1, K2, timeData, silhouette_scoreData, sum_of_square_errorData):
 
-      plt.xlabel("Amount of cluster")
+      plt.xlabel("number of clusters")
       plt.ylabel("Time")
       plt.xticks(numpy.arange(K1, K2+1, 1))
       plt.bar(numpy.arange(K1, K2+1, 1), numpy.mean(timeData, 0)) 
@@ -106,7 +106,7 @@ def outputPlot(K1, K2, timeData, silhouette_scoreData, sum_of_square_errorData):
       fig.savefig('time.png', dpi=100)
 
       plt.clf()
-      plt.xlabel("Amount of cluster")
+      plt.xlabel("number of clusters")
       plt.ylabel("Silhouette_score")
       plt.xticks(numpy.arange(K1, K2+1, 1))
       plt.bar(numpy.arange(K1, K2+1, 1), numpy.mean(silhouette_scoreData, 0)) 
@@ -114,7 +114,7 @@ def outputPlot(K1, K2, timeData, silhouette_scoreData, sum_of_square_errorData):
       fig.savefig('silhouette_score.png', dpi=100)
 
       plt.clf()
-      plt.xlabel("Amount of cluster")
+      plt.xlabel("number of clusters")
       plt.ylabel("Sum_of_square_error")
       plt.xticks(numpy.arange(K1, K2+1, 1))
       plt.plot(numpy.arange(K1, K2+1, 1), numpy.mean(sum_of_square_errorData, 0), marker = 'o') 

@@ -42,13 +42,25 @@ b) K-Means++
 ## Manual:
 - 資料集必須與程式相同資料夾
 
-## Experimental Result:
+## Simulation Result:
+
 ### Environment:
 - OS: Windows 10
 - CPU: i7-6700HQ
 - RAM: 8G
 - Compiler: Python 3
-### Discussion
+
+### K-means(Iris)
+**Time of  cluster** </br>
+![](Image/time.png) </br>
+**Silhouette_score of  cluster** </br>
+![](Image/silhouette_score.png) </br>
+**Sum_of_square_error** </br>
+![](Image/sum_of_square_error.png) </br>
+
+### K-means++(Abalone)
+
+## Discussion
 
 
 ## Conclusion:
