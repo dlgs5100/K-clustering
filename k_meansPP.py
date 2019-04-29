@@ -12,7 +12,7 @@ class K_meansPP():
             self.sum_of_square_error = []
 
       def initCentroid(self):
-            firstMean = random.randint(0,self.sourceData.shape[0])
+            firstMean = random.randint(0,self.sourceData.shape[0]-1)
             self.centerData.append(self.sourceData[firstMean])
             for k in range(self.K-1):
                   dataDistance = []
